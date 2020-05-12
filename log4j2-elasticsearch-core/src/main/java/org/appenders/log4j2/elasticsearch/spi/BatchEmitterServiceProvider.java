@@ -67,9 +67,9 @@ public class BatchEmitterServiceProvider {
             Iterator<BatchEmitterFactory> it = loader.iterator();
             while (it.hasNext()) {
                 BatchEmitterFactory factory = it.next();
-                LOG.debug("BatchEmitterFactory class found {}", factory.getClass().getName());
+                LOG.info("BatchEmitterFactory class found {}", factory.getClass().getName());
                 if (factory.accepts(clientObjectFactory.getClass())) {
-                    LOG.debug("Using {} as BatchEmitterFactoryProvider", factory);
+                    LOG.info("Using {} as BatchEmitterFactoryProvider", factory);
                     return factory.createInstance(batchSize, deliveryInterval, clientObjectFactory, failoverPolicy);
                 }
             }
