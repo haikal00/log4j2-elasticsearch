@@ -66,7 +66,7 @@ public class BatchEmitterServiceProviderTest {
     public void setUp()
     {
         PowerMockito.mockStatic(ServiceLoader.class);
-        Mockito.when(ServiceLoader.load(Mockito.any(Class.class))).thenReturn(mockServiceLoader);
+        Mockito.when(ServiceLoader.load(Mockito.any(Class.class), Mockito.any(ClassLoader.class))).thenReturn(mockServiceLoader);
     }
 
     @Test
