@@ -59,6 +59,9 @@ public class BatchEmitterServiceProviderTest {
     @Mock
     private ServiceLoader<BatchEmitterFactory> mockServiceLoader;
 
+    @Mock
+    private ClassLoader mockSystemClassLoader;
+
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
@@ -132,6 +135,29 @@ public class BatchEmitterServiceProviderTest {
         // when
         createWithTestValues(serviceProvider);
 
+
+    }
+
+    @Test
+    public void succeedsWithLoadingSystemClassLoader() {
+        // given
+        BatchEmitterServiceProvider serviceProvider = spy(new BatchEmitterServiceProvider());
+
+        Iterator<BatchEmitterFactory> iterator = new ArrayList<BatchEmitterFactory>() {{
+            add(new TestBatchEmitterFactory());
+        }}.iterator();
+
+        when(mockServiceLoader.iterator()).thenReturn(iterator);
+
+        // simulate that SystemClassLoader is a separate instance
+        PowerMockito.mockStatic(ClassLoader.class);
+        Mockito.when(ClassLoader.getSystemClassLoader()).thenReturn(mockSystemClassLoader);
+
+        // when
+        BatchEmitter emitter = createWithTestValues(serviceProvider);
+
+        // then
+        Assert.assertNotNull(emitter);
 
     }
 

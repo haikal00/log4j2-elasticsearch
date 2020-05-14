@@ -83,17 +83,20 @@ public class BatchEmitterServiceProvider {
      * @return Array of ClassLoader
      */
     public static ClassLoader[] getClassLoaders() {
+        LOG.debug("Retrieving ClassLoaders");
         final List<ClassLoader> classLoaders = new ArrayList<>();
         final ClassLoader current = BatchEmitterServiceProvider.class.getClassLoader();
         classLoaders.add(current);
 
         ClassLoader parent = (current == null ? null : current.getParent());
         while (parent != null && !classLoaders.contains(parent)) {
+            LOG.debug("Adding Parent ClassLoader");
             classLoaders.add(parent);
             parent = parent.getParent();
         }
         final ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
         if (!classLoaders.contains(systemClassLoader)) {
+            LOG.debug("Adding System ClassLoader");
             classLoaders.add(systemClassLoader);
         }
         return classLoaders.toArray(new ClassLoader[classLoaders.size()]);
