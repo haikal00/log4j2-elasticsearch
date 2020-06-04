@@ -32,9 +32,6 @@ import org.appenders.log4j2.elasticsearch.FailoverPolicy;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import java.util.List;
-import java.util.ArrayList;
-
 /**
  * {@link BatchEmitterFactory} SPI loader.
  */
@@ -62,44 +59,53 @@ public class BatchEmitterServiceProvider {
                                        int deliveryInterval,
                                        ClientObjectFactory clientObjectFactory,
                                        FailoverPolicy failoverPolicy) {
-        for(final ClassLoader classLoader: getClassLoaders()){
-            ServiceLoader<BatchEmitterFactory> loader = ServiceLoader.load(BatchEmitterFactory.class, classLoader);
-            Iterator<BatchEmitterFactory> it = loader.iterator();
-            while (it.hasNext()) {
-                BatchEmitterFactory factory = it.next();
-                LOG.info("BatchEmitterFactory class found {}", factory.getClass().getName());
-                if (factory.accepts(clientObjectFactory.getClass())) {
-                    LOG.info("Using {} as BatchEmitterFactoryProvider", factory);
-                    return factory.createInstance(batchSize, deliveryInterval, clientObjectFactory, failoverPolicy);
-                }
-            }
+
+        ServiceLoader<BatchEmitterFactory> serviceLoader = ServiceLoader.load(BatchEmitterFactory.class);
+
+        BatchEmitter batchEmitter = iterateServiceLoader(batchSize, deliveryInterval, clientObjectFactory,
+                failoverPolicy,  serviceLoader);
+        if (batchEmitter != null){
+            return batchEmitter;
         }
+
+        serviceLoader = ServiceLoader.load(BatchEmitterFactory.class,
+                BatchEmitterServiceProvider.class.getClassLoader());
+
+        batchEmitter = iterateServiceLoader(batchSize, deliveryInterval, clientObjectFactory,
+            failoverPolicy,  serviceLoader);
+        if (batchEmitter != null){
+            return batchEmitter;
+        }
+
         throw new ConfigurationException(String.format("No compatible BatchEmitter implementations for %s found", clientObjectFactory.getClass().getName()));
 
     }
 
     /**
-     * Collects ClassLoader and all it's parents.
-     * @return Array of ClassLoader
+     * Retrieve the iterator from ServiceLoader, check all the BatchEmitterFactory to load the class.
+     * @param batchSize             parameter from method {@link BatchEmitter#createInstance(int, int, ClientObjectFactory ,FailoverPolicy)}
+     * @param deliveryInterval      parameter from method {@link BatchEmitter#createInstance(int, int, ClientObjectFactory ,FailoverPolicy)}
+     * @param clientObjectFactory   parameter from method {@link BatchEmitter#createInstance(int, int, ClientObjectFactory ,FailoverPolicy)}
+     * @param failoverPolicy        parameter from method {@link BatchEmitter#createInstance(int, int, ClientObjectFactory ,FailoverPolicy)}
+     * @param loader                ServiceLoader to iterate.
+     * @return Instance of BatchEmitter created via BatchEmitterFactory if found. Otherwise return null.
      */
-    public static ClassLoader[] getClassLoaders() {
-        LOG.debug("Retrieving ClassLoaders");
-        final List<ClassLoader> classLoaders = new ArrayList<>();
-        final ClassLoader current = BatchEmitterServiceProvider.class.getClassLoader();
-        classLoaders.add(current);
-
-        ClassLoader parent = (current == null ? null : current.getParent());
-        while (parent != null && !classLoaders.contains(parent)) {
-            LOG.debug("Adding Parent ClassLoader");
-            classLoaders.add(parent);
-            parent = parent.getParent();
+    private BatchEmitter iterateServiceLoader(int batchSize,
+                                              int deliveryInterval,
+                                              ClientObjectFactory clientObjectFactory,
+                                              FailoverPolicy failoverPolicy, ServiceLoader<BatchEmitterFactory> loader){
+        if(loader==null){
+            return null;
         }
-        final ClassLoader systemClassLoader = ClassLoader.getSystemClassLoader();
-        if (!classLoaders.contains(systemClassLoader)) {
-            LOG.debug("Adding System ClassLoader");
-            classLoaders.add(systemClassLoader);
+        Iterator<BatchEmitterFactory> it = loader.iterator();
+        while (it.hasNext()) {
+            BatchEmitterFactory factory = it.next();
+            LOG.info("BatchEmitterFactory class found {}", factory.getClass().getName());
+            if (factory.accepts(clientObjectFactory.getClass())) {
+                LOG.info("Using {} as BatchEmitterFactoryProvider", factory);
+                return factory.createInstance(batchSize, deliveryInterval, clientObjectFactory, failoverPolicy);
+            }
         }
-        return classLoaders.toArray(new ClassLoader[classLoaders.size()]);
+        return null;
     }
-
 }

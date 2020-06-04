@@ -9,9 +9,9 @@ package org.appenders.log4j2.elasticsearch;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -24,6 +24,7 @@ package org.appenders.log4j2.elasticsearch;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.ConfigurationException;
 import org.appenders.log4j2.elasticsearch.spi.BatchEmitterServiceProvider;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -58,9 +59,6 @@ public class BatchEmitterServiceProviderTest {
 
     @Mock
     private ServiceLoader<BatchEmitterFactory> mockServiceLoader;
-
-    @Mock
-    private ClassLoader mockSystemClassLoader;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -135,29 +133,6 @@ public class BatchEmitterServiceProviderTest {
         // when
         createWithTestValues(serviceProvider);
 
-
-    }
-
-    @Test
-    public void succeedsWithLoadingSystemClassLoader() {
-        // given
-        BatchEmitterServiceProvider serviceProvider = spy(new BatchEmitterServiceProvider());
-
-        Iterator<BatchEmitterFactory> iterator = new ArrayList<BatchEmitterFactory>() {{
-            add(new TestBatchEmitterFactory());
-        }}.iterator();
-
-        when(mockServiceLoader.iterator()).thenReturn(iterator);
-
-        // simulate that SystemClassLoader is a separate instance
-        PowerMockito.mockStatic(ClassLoader.class);
-        Mockito.when(ClassLoader.getSystemClassLoader()).thenReturn(mockSystemClassLoader);
-
-        // when
-        BatchEmitter emitter = createWithTestValues(serviceProvider);
-
-        // then
-        Assert.assertNotNull(emitter);
 
     }
 
