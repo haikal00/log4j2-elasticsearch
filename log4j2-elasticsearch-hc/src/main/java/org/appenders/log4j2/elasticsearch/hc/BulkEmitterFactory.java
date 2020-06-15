@@ -26,7 +26,7 @@ import org.appenders.log4j2.elasticsearch.BatchEmitterFactory;
 import org.appenders.log4j2.elasticsearch.BulkEmitter;
 import org.appenders.log4j2.elasticsearch.ClientObjectFactory;
 import org.appenders.log4j2.elasticsearch.FailoverPolicy;
-
+import static org.appenders.log4j2.elasticsearch.SysoutLog.out;
 public class BulkEmitterFactory implements BatchEmitterFactory<BulkEmitter> {
 
     @Override
@@ -36,6 +36,8 @@ public class BulkEmitterFactory implements BatchEmitterFactory<BulkEmitter> {
 
     @Override
     public BulkEmitter createInstance(int batchSize, int deliveryInterval, ClientObjectFactory clientObjectFactory, FailoverPolicy failoverPolicy) {
+        out("BulkEmitterFactory::createInstance");
+        out("ClientObjectFactory:" + clientObjectFactory.getClass());
         BulkEmitter bulkEmitter = new BulkEmitter(batchSize, deliveryInterval, clientObjectFactory.createBatchOperations());
         bulkEmitter.addListener(clientObjectFactory.createBatchListener(failoverPolicy));
         return bulkEmitter;

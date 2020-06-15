@@ -23,7 +23,7 @@ package org.appenders.log4j2.elasticsearch.hc;
 import org.apache.http.nio.util.SimpleInputBuffer;
 import org.appenders.log4j2.elasticsearch.ItemSource;
 import org.appenders.log4j2.elasticsearch.ReleaseCallback;
-
+import static org.appenders.log4j2.elasticsearch.SysoutLog.out;
 /**
  * {@code org.apache.http.nio.util.SimpleInputBuffer} backed {@link ItemSource}.
  * When it's no longer needed, {@link #release()} MUST be called to release underlying resources.
@@ -40,6 +40,7 @@ public class InputBufferItemSource implements ItemSource<SimpleInputBuffer> {
 
     @Override
     public SimpleInputBuffer getSource() {
+        out("InputBufferItemSource::getSource()");
         return source;
     }
 
@@ -47,6 +48,7 @@ public class InputBufferItemSource implements ItemSource<SimpleInputBuffer> {
      * Invokes given callback
      */
     public void release() {
+        out("InputBufferItemSource:;release()");
         releaseCallback.completed(this);
     }
 

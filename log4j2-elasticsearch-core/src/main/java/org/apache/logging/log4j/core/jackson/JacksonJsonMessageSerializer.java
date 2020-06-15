@@ -24,6 +24,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.std.StdScalarSerializer;
 import org.apache.logging.log4j.message.Message;
+import org.appenders.log4j2.elasticsearch.SysoutLog;
 
 import java.io.IOException;
 
@@ -37,6 +38,9 @@ public class JacksonJsonMessageSerializer extends StdScalarSerializer<Message> {
 
     @Override
     public void serialize(final Message value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException {
+        SysoutLog.out("JacksonJsonMessageSerializer::toString():" + value.toString());
+        SysoutLog.out("JacksonJsonMessageSerializer::getFormat():" + value.getFormat());
+
         jgen.writeRaw(value.getFormattedMessage());
     }
 

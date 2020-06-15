@@ -55,6 +55,7 @@ public class StringItemSourceFactory implements ItemSourceFactory {
     @Override
     public ItemSource create(Object event, ObjectWriter objectWriter) {
         try {
+            SysoutLog.out("StringItemSourceFactory::create");
             return new StringItemSource(objectWriter.writeValueAsString(event));
         } catch (JsonProcessingException e) {
             // dev's error. returning null to resurface

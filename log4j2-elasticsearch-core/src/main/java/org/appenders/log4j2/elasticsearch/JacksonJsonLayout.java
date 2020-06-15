@@ -43,7 +43,7 @@ import org.apache.logging.log4j.message.Message;
 
 import java.util.Arrays;
 import java.util.List;
-
+import static org.appenders.log4j2.elasticsearch.SysoutLog.out;
 /**
  * Allows to customize serialization of incoming events. See {@link Builder} API docs for more details
  */
@@ -114,7 +114,8 @@ public class JacksonJsonLayout extends AbstractLayout<ItemSource> implements Ite
 
         @Override
         public JacksonJsonLayout build() {
-
+            out("JacksonJsonLayout.Builder.build()");
+            out("itemSourceFactory:" + itemSourceFactory.getClass().getName());
             if (getConfiguration() == null) {
                 throw new ConfigurationException("No Configuration instance provided for " + PLUGIN_NAME);
             }
@@ -131,21 +132,21 @@ public class JacksonJsonLayout extends AbstractLayout<ItemSource> implements Ite
             ObjectMapper objectMapper = createDefaultObjectMapper();
             objectMapper.registerModule(new ExtendedLog4j2JsonModule());
 
-            if (useAfterburner) {
-                // com.fasterxml.jackson.module:jackson-module-afterburner required here
-                new JacksonAfterburnerModuleConfigurer().configure(objectMapper);
-            }
-
-            for (JacksonMixIn mixin : mixins) {
-                objectMapper.addMixIn(mixin.getTargetClass(), mixin.getMixInClass());
-            }
-
-            for (VirtualProperty property : virtualProperties) {
-                if (!property.isDynamic()) {
-                    property.setValue(createValueResolver().resolve(property.getValue()));
-                }
-            }
-
+//            if (useAfterburner) {
+//                // com.fasterxml.jackson.module:jackson-module-afterburner required here
+//                new JacksonAfterburnerModuleConfigurer().configure(objectMapper);
+//            }
+//
+//            for (JacksonMixIn mixin : mixins) {
+//                objectMapper.addMixIn(mixin.getTargetClass(), mixin.getMixInClass());
+//            }
+//
+//            for (VirtualProperty property : virtualProperties) {
+//                if (!property.isDynamic()) {
+//                    property.setValue(createValueResolver().resolve(property.getValue()));
+//                }
+//            }
+//
             SerializationConfig customConfig = objectMapper.getSerializationConfig()
                     .with(new JacksonHandlerInstantiator(
                             virtualProperties,
@@ -166,6 +167,7 @@ public class JacksonJsonLayout extends AbstractLayout<ItemSource> implements Ite
         }
 
         protected ObjectMapper createDefaultObjectMapper() {
+            out("JacksonJsonLayout.Builder::createDefaultObjectMapper()");
             return new ExtendedObjectMapper(new JsonFactory())
                     .setSerializationInclusion(JsonInclude.Include.NON_EMPTY)
                     .configure(SerializationFeature.CLOSE_CLOSEABLE, false);

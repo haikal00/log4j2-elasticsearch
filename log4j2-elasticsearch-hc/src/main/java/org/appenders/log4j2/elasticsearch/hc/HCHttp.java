@@ -61,7 +61,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.Function;
 
 import static org.appenders.log4j2.elasticsearch.hc.HCHttp.PLUGIN_NAME;
-
+import static org.appenders.log4j2.elasticsearch.SysoutLog.out;
 /**
  * {@link PooledItemSourceFactory}-based {@link ClientObjectFactory}. {@link PooledItemSourceFactory} MUST be configured.
  * Produces {@link HttpClient} and related objects.
@@ -343,7 +343,7 @@ public class HCHttp implements ClientObjectFactory<HttpClient, BatchRequest> {
 
         @Override
         public HCHttp build() {
-
+            out("HCHttp.Builder.build()");
             validate();
 
             return new HCHttp(this);

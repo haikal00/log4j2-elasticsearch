@@ -32,7 +32,7 @@ import org.apache.logging.log4j.core.config.plugins.PluginBuilderFactory;
 import org.apache.logging.log4j.core.config.plugins.PluginElement;
 import org.apache.logging.log4j.status.StatusLogger;
 import org.appenders.log4j2.elasticsearch.thirdparty.ReusableByteBufOutputStream;
-
+import static org.appenders.log4j2.elasticsearch.SysoutLog.out;
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -51,6 +51,7 @@ public class PooledItemSourceFactory implements ItemSourceFactory {
     final ItemSourcePool bufferedItemSourcePool;
 
     protected PooledItemSourceFactory(ItemSourcePool bufferedItemSourcePool) {
+        out("PooledItemSourceFactory::constructor");
         this.bufferedItemSourcePool = bufferedItemSourcePool;
     }
 
@@ -73,6 +74,11 @@ public class PooledItemSourceFactory implements ItemSourceFactory {
      */
     @Override
     public ItemSource create(Object source, ObjectWriter objectWriter) {
+        out("PooledItemSourceFactory::create");
+        org.apache.logging.log4j.core.impl.MutableLogEvent evt = (org.apache.logging.log4j.core.impl.MutableLogEvent)source;
+        out("source:" + source.toString());
+        out("formatted message: " + evt.getFormattedMessage());
+        out("objectWriter:" + objectWriter.getClass().getName());
         ItemSource<ByteBuf> pooled;
         try {
             pooled = bufferedItemSourcePool.getPooled();
@@ -136,7 +142,7 @@ public class PooledItemSourceFactory implements ItemSourceFactory {
 
         @Override
         public PooledItemSourceFactory build() {
-
+            out("PooledItemSourceFactory::builder::build()");
             if (initialPoolSize <= 0) {
                 throw new ConfigurationException("initialPoolSize must be higher than 0 for " + PLUGIN_NAME);
             }
@@ -174,7 +180,7 @@ public class PooledItemSourceFactory implements ItemSourceFactory {
 
         /* extension point */
         ItemSourcePool configuredItemSourcePool() {
-
+            out("PooledItemSourceFactory::configuredItemSourcePool()");
             UnpooledByteBufAllocator byteBufAllocator = new UnpooledByteBufAllocator(false, false, false);
             ByteBufPooledObjectOps pooledObjectOps = new ByteBufPooledObjectOps(
                     byteBufAllocator,
