@@ -128,25 +128,25 @@ public class JacksonJsonLayout extends AbstractLayout<ItemSource> implements Ite
         }
 
         protected ObjectWriter createConfiguredWriter(List<JacksonMixIn> mixins) {
-
+            out("JacksonJsonLayout.createConfiguredWriter()");
             ObjectMapper objectMapper = createDefaultObjectMapper();
             objectMapper.registerModule(new ExtendedLog4j2JsonModule());
 
-//            if (useAfterburner) {
-//                // com.fasterxml.jackson.module:jackson-module-afterburner required here
-//                new JacksonAfterburnerModuleConfigurer().configure(objectMapper);
-//            }
-//
-//            for (JacksonMixIn mixin : mixins) {
-//                objectMapper.addMixIn(mixin.getTargetClass(), mixin.getMixInClass());
-//            }
-//
-//            for (VirtualProperty property : virtualProperties) {
-//                if (!property.isDynamic()) {
-//                    property.setValue(createValueResolver().resolve(property.getValue()));
-//                }
-//            }
-//
+            if (useAfterburner) {
+                // com.fasterxml.jackson.module:jackson-module-afterburner required here
+                new JacksonAfterburnerModuleConfigurer().configure(objectMapper);
+            }
+
+            for (JacksonMixIn mixin : mixins) {
+                objectMapper.addMixIn(mixin.getTargetClass(), mixin.getMixInClass());
+            }
+
+            for (VirtualProperty property : virtualProperties) {
+                if (!property.isDynamic()) {
+                    property.setValue(createValueResolver().resolve(property.getValue()));
+                }
+            }
+
             SerializationConfig customConfig = objectMapper.getSerializationConfig()
                     .with(new JacksonHandlerInstantiator(
                             virtualProperties,

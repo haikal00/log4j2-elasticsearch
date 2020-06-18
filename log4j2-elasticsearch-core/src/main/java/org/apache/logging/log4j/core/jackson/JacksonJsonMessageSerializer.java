@@ -40,8 +40,10 @@ public class JacksonJsonMessageSerializer extends StdScalarSerializer<Message> {
     public void serialize(final Message value, final JsonGenerator jgen, final SerializerProvider provider) throws IOException {
         SysoutLog.out("JacksonJsonMessageSerializer::toString():" + value.toString());
         SysoutLog.out("JacksonJsonMessageSerializer::getFormat():" + value.getFormat());
+        SysoutLog.out("JacksonJsonMessageSerializer::getFormattedMessage():" + value.getFormattedMessage());
 
-        jgen.writeRaw(value.getFormattedMessage());
+        //jgen.writeRaw(value.getFormattedMessage());
+        jgen.writeObject(value.getParameters()[0]);
     }
 
 }

@@ -79,6 +79,7 @@ public class BatchRequest implements Request {
             byteBufOutputStream.writeByte(LINE_SEPARATOR);
 
         }
+        System.out.println("BatchRequest.serialize()::"+buffer.toString());
         return buffer;
     }
 
